@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="co.mini.soyg.study.serviceImpl.Study-mapper">
+
+	<!-- 클래스 리스트 -->
+	<select id="getStudyList" resultType="co.mini.soyg.study.vo.StudyVO">
+		SELECT * FROM class
+	</select>
+
+	<!-- 클래스 하나 정보 -->
+	<select id="getStudySelect" parameterType="int" resultType="co.mini.soyg.study.vo.StudyVO">
+		SELECT cl.*, ca.field_name, TO_CHAR(cl.start_date, 'yyyy-mm-dd') AS cDate FROM class cl, category ca WHERE cl.field_code = ca.field_code AND class_code = #{class_Code}
+	</select> 
+		
+	<!-- 지역 리스트 가져오기 -->
+	<select id="getLocList" resultType="co.mini.soyg.study.vo.CategoryVO">
+		SELECT * FROM category WHERE field_code IS NULL
+	</select> 
+	
+	<!-- 분류 리스트 가져오기 -->
+	<select id="getFieldList" resultType="co.mini.soyg.study.vo.CategoryVO">
+		SELECT * FROM category WHERE loc_code IS NULL
+	</select>
+	
+	<!-- 클래스 테이블에 값 넣기 -->
+	<insert id="insertClass" parameterType="co.mini.soyg.study.vo.StudyInsertVO">
+		INSERT INTO class 
+		VALUES (class_seq.nextval, #{loc_code}, #{class_name}, to_date(#{start_date}, 'yy-mm-dd'), #{class_image}, #{class_info}, 
+		        #{class_active}, #{class_startchk}, to_number(#{class_personnel}), #{field_code}, #{weekdays_chk}, #{class_time},
+        		#{captain}, #{city})
+	</insert>
+	
+	<!-- class_image 테이블에 값 넣기 -->
+	<insert id="insertClassImage" parameterType="co.mini.soyg.study.vo.StudyInsertVO">
+		INSERT INTO class_image
+		VALUES (class_seq.currval, #{main_image2}, #{main_image3}, #{main_image4}, #{main_image5})
+	</insert>
+	
+	<!-- class_image 1개 셀렉 -->
+	<select id="getImageSelect" parameterType="int" resultType="co.mini.soyg.study.vo.ImageVO">
+		SELECT * FROM class_image WHERE class_code = #{class_code}
+	</select>
+	
+	<!-- class_course에 값넣기 -->
+	<insert id="addCourseInsert" parameterType="co.mini.soyg.study.vo.CourseVO">
+		INSERT INTO class_course VALUES(class_seq.currval, #{big_course}, #{mid_course}, #{small_course})
+	</insert>
+	
+	<select id="getCourseList" parameterType="int" resultType="co.mini.soyg.study.vo.CourseVO">
+		SELECT * FROM class_course WHERE class_code = #{class_code}
+	</select>
+	
+	<!-- 클래스 삭제 -->
+	<delete id="deleteStudy" parameterType="int">
+		delete from class where class_code = #{class_code}
+	</delete>
+	
+	<!-- 클래스 수정 -->
+	<update id="updateStudy" parameterType="co.mini.soyg.study.vo.StudyInsertVO">
+		UPDATE class 
+		SET loc_code = #{loc_code}, class_name = #{class_name}, start_date = to_date(#{start_date}, 'yy-mm-dd'), class_info = #{class_info}, class_active = #{class_active}, class_startchk = #{class_startchk}, class_personnel = #{class_personnel}, field_code = #{field_code}, weekdays_chk = #{weekdays_chk}, class_time = #{class_time}, city = #{city} 
+		WHERE class_code = #{class_code}
+	</update>
+	
+	
+</mapper>

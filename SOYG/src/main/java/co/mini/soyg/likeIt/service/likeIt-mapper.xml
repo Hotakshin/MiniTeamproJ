@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="co.mini.soyg.likeIt.service.likeIt-mapper">
+
+<!-- 좋아요 클릭 시 likeit table에 정보 등록 -->
+<insert id="likeItUpdate" parameterType="co.mini.soyg.main.vo.MainVO">
+	insert into likeIT(userId, class_code, like_check) values(#{userId}, #{class_code}, 'Y')
+</insert>
+
+<!-- 좋아요 개수 카운트 -->
+<select id="likeItCount" resultType="co.mini.soyg.likeIt.vo.LikeItVO" parameterType="co.mini.soyg.likeIt.vo.LikeItVO">
+	select count(class_code) as likeCnt from likeIT where class_code = #{class_code}
+</select>
+
+<!-- 좋아요 취소 -->
+<delete id="likeItUndo" parameterType="co.mini.soyg.likeIt.vo.LikeItVO">
+	delete from likeIT where class_code = #{class_code} and userId = #{userId}
+</delete>
+
+<!-- 특정 유저가 특정 클래스를 좋아요 한 적 있는가? -->
+<select id="likeCheck" parameterType="co.mini.soyg.likeIt.vo.LikeItVO" resultType="co.mini.soyg.likeIt.vo.LikeItVO">
+	select * from likeIT where USERID = #{userId} and class_code =#{class_code}
+</select>
+
+</mapper>

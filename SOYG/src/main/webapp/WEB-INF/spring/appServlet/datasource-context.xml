@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+	xsi:schemaLocation="http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- DBCP -->
+	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource">
+		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
+		<property name="url" value="jdbc:oracle:thin:@soyg2.cyjec66chjxh.ap-northeast-2.rds.amazonaws.com:1521:SOYG2" />
+		<property name="username" value="SOYG2" />
+		<property name="password" value="SOYG1234" />
+	</bean>
+	
+	<!-- Mybatis -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+									<!-- ┌>위에 있는 DBCP의 id랑 같아야함 -->
+		<property name="dataSource" ref="dataSource" />		<!-- ┌>이 이름은 내가 임의로 짓는 것. 의미있는 작명하기 -->
+		<property name="configLocation" value="classpath:mapper/mybatis-config.xml" />
+		<property name="mapperLocations" value="classpath*:co/mini/soyg/**/*mapper.xml"/>
+	</bean>
+	
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="sqlSessionFactory" />
+	</bean>
+</beans>

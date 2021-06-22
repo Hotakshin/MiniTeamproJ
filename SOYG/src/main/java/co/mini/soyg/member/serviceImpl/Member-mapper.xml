@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="co.mini.member.serviceImpl.Member-mapper">
+
+<!-- 중복확인 -->
+<select id="idCheck" parameterType="co.mini.soyg.member.vo.MemberVO" resultType="String">
+	SELECT USERID from member where USERID = #{userId}
+</select>
+<!-- 회원가입 -->
+<insert id="insertMember" parameterType="co.mini.soyg.member.vo.MemberVO">
+	INSERT INTO member VALUES(#{userId},#{password},#{address},#{email},#{gender},#{phone},#{birth},#{name})
+</insert>
+<!-- 맴버리스트..? -->
+<select id="memberList" resultType="co.mini.soyg.member.vo.MemberVO">
+	SELECT * FROM member
+</select>
+<!-- 회원중복 테스트 -->
+<select id="loginCheck" parameterType="co.mini.soyg.member.vo.MemberVO" resultType="co.mini.soyg.member.vo.MemberVO">
+	SELECT * FROM member where userId = #{userId} and password = #{password}
+</select>
+<!-- 회원정보 -->
+<select id="memberSelect" parameterType="co.mini.soyg.member.vo.MemberVO" resultType="co.mini.soyg.member.vo.MemberVO">
+	SELECT * FROM member WHERE userId = #{userId}
+</select>
+<select id="passwordCheck" parameterType="co.mini.soyg.member.vo.MemberVO" resultType="co.mini.soyg.member.vo.MemberVO">
+	SELECT PASSWORD FROM MEMBER WHERE userId = #{userId} and password = #{password}
+</select>
+<!-- 이메일 수정 -->
+<update id="updateAddress" parameterType="co.mini.soyg.member.vo.MemberVO" >
+	UPDATE MEMBER SET ADDRESS = #{address} WHERE USERID = #{userId}
+</update>
+<!-- 정보 수정 -->
+<update id="updateInfo" parameterType="co.mini.soyg.member.vo.MemberVO" >
+	UPDATE MEMBER SET EMAIL = #{email}, PHONE = #{phone}, BIRTH = #{birth} WHERE USERID = #{userId}
+</update>
+<!-- 비밀번호 수정 -->
+<update id="updatePassword" parameterType="co.mini.soyg.member.vo.MemberVO">
+	UPDATE MEMBER SET PASSWORD = #{password} WHERE USERID = #{userId}
+</update>
+<delete id="deleteMember" parameterType="co.mini.soyg.member.vo.MemberVO">
+	DELETE FROM MEMBER WHERE USERID = #{userId}
+</delete>
+<!--  클레스 탈퇴 -->
+<delete id="dropClass" parameterType="co.mini.soyg.member.vo.MemberVO">
+	DELETE FROM CLASS_MEMBER WHERE USERID = #{userId} and CLASS_CODE = #{class_code}
+</delete>
+
+
+<!-- 비밀번호 찾기 -->
+<select id="passFinder" parameterType="co.mini.soyg.member.vo.MemberVO" resultType="co.mini.soyg.member.vo.MemberVO">
+	select * from member
+	where userID = #{userId} and name = #{name} and birth = #{birth} and phone = #{phone}
+</select>
+
+<!--특정 유저가 좋아요 한 스터디 리스트 조회-->
+<select id="myLikeList" resultType="co.mini.soyg.member.vo.MemberVO" parameterType="co.mini.soyg.member.vo.MemberVO">
+	select *
+	from class c join loc_info l
+	using (loc_code)
+	join field_info f
+	using (field_code)
+	join (select c.class_code, i.LIKE_CHECK
+          from class c LEFT OUTER JOIN likeIt i 
+          on c.class_code = i.class_code
+          where i.USERID = #{userId}
+          GROUP BY  c.class_code, c.loc_code, c.class_name, c.start_date, c.class_image, c.class_info, c.class_active, c.class_startchk, c.class_personnel, c.field_code, c.weekdays_chk, c.class_time, c.captain, c.city, i.LIKE_CHECK
+          ) u
+    using (class_code)
+</select>
+
+</mapper>
+

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="co.mini.soyg.admin.service.admin-map">
+
+	<!-- 페이징/리스트 카운트 -->
+	<select id="classCnt" resultType="int">
+		select count(*) from class
+	</select>
+
+	<!-- 페이징/1~10까지 조회 -->
+	<select id="classListPage" parameterType="co.mini.soyg.admin.vo.ClassVO" resultType="co.mini.soyg.admin.vo.ClassVO">
+		select class_code,city,field_code, class_name,class_active, class_startchk
+		from (select ROWNUM RN, a.* from
+				(select * from class order by class_code) a) c
+		where c.rn
+		between #{firstCnt} and #{lastCnt}
+	</select>
+	
+	
+	<select id="adminClassListSelect"
+		resultType="co.mini.soyg.admin.vo.ClassVO">
+		select * from class order by 1
+	</select>
+	<select id="adminClassSelect"
+		parameterType="co.mini.soyg.admin.vo.ClassVO"
+		resultType="co.mini.soyg.admin.vo.ClassVO">
+		select * from class where class_code = #{class_code}
+	</select>
+
+	<update id="adminClassUpdate"
+		parameterType="co.mini.soyg.admin.vo.ClassVO">
+		update class
+		set class_name = #{class_name},
+		start_date = #{start_date},
+		class_info = #{class_info},
+		class_active = #{class_active},
+		class_startchk = #{class_startchk},
+		class_personnel =#{class_personnel},
+		loc_code = #{loc_code},
+		weekdays_chk = #{weekdays_chk},
+		class_time = #{class_time},
+		field_code = #{field_code}
+		
+		where class_code = #{class_code}
+	</update>
+
+	<delete id="adminClassDelete"
+		parameterType="co.mini.soyg.admin.vo.ClassVO">
+		delete from class where class_code= #{class_code}
+	</delete>
+	
+	<!-- 회원 검색 -->
+	<select id="adminClassSearch" parameterType="co.mini.soyg.admin.vo.ClassVO" resultType="co.mini.soyg.admin.vo.ClassVO">
+		select * from class
+		where (class_name like '%' || #{class_name} || '%')
+		and (city like '%' || #{city} || '%')
+		and(field_code like '%' || #{field_code} || '%')
+	
+	</select>
+
+</mapper>

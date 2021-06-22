@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+       "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+	<!-- Main LayOut -->
+	<definition name="layout" template="/WEB-INF/views/tiles/tiles-layout.jsp">
+		<!-- <put-attribute name="menu" value="/WEB-INF/views/tiles/menuTemplate.jsp" /> -->
+		<put-attribute name="header" value="/WEB-INF/views/tiles/headerTemplate.jsp" />
+		<put-attribute name="body" value="/" />
+		<put-attribute name="foot" value="/WEB-INF/views/tiles/footerTemplate.jsp" />
+	</definition>
+	
+	<definition name="*/*" extends="layout">
+		<put-attribute name="body" value="/WEB-INF/views/{1}/{2}.jsp" />
+		<put-attribute name="title" value="SOYG:::니 성적에 잠이 오냐?" />
+	</definition>
+	<!-- 3개를 보낼 경우 똑같이 3개를 맞춰줘야함. -->
+<!-- 	<definition name="*/*/*" extends="layout">
+		<put-attribute name="body" value="/WEB-INF/views/{1}/{2}/{3}.jsp" />
+	</definition> -->
+</tiles-definitions>

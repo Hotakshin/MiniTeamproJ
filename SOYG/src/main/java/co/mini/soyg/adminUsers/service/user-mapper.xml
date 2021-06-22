@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="co.mini.soyg.adminUsers.service.user-mapper">
+
+	<!-- 
+		관리자 회원 관련 기능
+		
+		일반 멤버와 차별화를 두기 위해 User로 임의 설정.
+		쿼리는 DB명 그대로 member
+	-->
+
+<!-- 전체 조회 (페이징) --> 
+	<!-- 실질적 쿼리 -->
+	<select id = "userPaging" parameterType="co.mini.soyg.adminUsers.vo.UserVO" resultType="co.mini.soyg.adminUsers.vo.UserVO">
+		SELECT * FROM (SELECT ROWNUM RN, A.* FROM (SELECT * FROM member ORDER BY 1 DESC ) A) WHERE RN BETWEEN #{firstCnt} AND #{lastCnt}
+	</select>
+
+	<!-- 수 매김 -->
+	<select id = "userCnt" resultType = "int">
+		select count(*) from member
+	</select>
+
+
+
+	<!-- 회원 하나 조회 -->
+	<select id="userSelect" parameterType="co.mini.soyg.adminUsers.vo.UserVO" resultType="co.mini.soyg.adminUsers.vo.UserVO">
+		select * from member where userID = #{userID}
+	</select>
+
+
+	<!-- 회원 수정 -->
+	<update id="userUpdate" parameterType="co.mini.soyg.adminUsers.vo.UserVO">
+		update member 
+		set password = #{password}, address = #{address}, 
+			email = #{email}, gender = #{gender}, 
+			phone = #{phone}, birth = #{birth}, name = #{name}
+		where userID = #{userID}  
+	</update>
+
+	<!-- 회원 삭제 -->
+	<update id="userDelete" parameterType="co.mini.soyg.adminUsers.vo.UserVO">
+		<!--
+		null 값 줌으로써 검색 안 되게 하려 했는데, null 값을 넣을 수 없게 설정해 놔서 폐기. 평범한 delete로 시행 
+		update member 
+		set password = #{password}, 
+						address = #{address, jdbcType=VARCHAR}, 
+						email = #{email, jdbcType=VARCHAR}, gender = #{gender, jdbcType=VARCHAR}, 
+						phone = #{phone, jdbcType=VARCHAR}, birth = #{birth, jdbcType=VARCHAR} 
+		where userID = #{userID}
+		-->
+		delete from member where userID = #{userID}  
+	</update>
+
+
+
+	
+<!-- 회원 검색 기능 (페이징 포기) -->
+
+	<!-- 실질적 검색 쿼리 -->
+	<select id = "userSearch" parameterType = "co.mini.soyg.adminUsers.vo.UserVO" resultType="co.mini.soyg.adminUsers.vo.UserVO">
+		
+		<!-- select * from 
+			(select rownum rn, a.* from(select * from member 
+			where (userID like '%' || #{userID} || '%') 
+			and (name like '%' || #{name} || '%') 
+			order by 1 desc) a)
+		where rn between #{firstCnt} and #{lastCnt} -->
+		select * from member 
+		 where (userID like '%' || #{userID} || '%') 
+		 and (name like '%' || #{name} || '%')
+	</select>
+	
+	<!-- 검색 이후 페이징을 위한 카운트 -->
+	<!-- 페이징 폐기로 인해 쓰이지 않음
+	<select id = "selectedUserCnt" resultType="int">
+		 
+		 select count(*) from member 
+		 where (userID like '%' || #{userID} || '%') 
+		 and (name like '%' || #{name} || '%')
+		 
+	</select>
+	 -->
+</mapper>

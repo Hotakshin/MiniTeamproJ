@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="co.mini.soyg.studyclass.serviceImpl.StudyClass-mapper">
+	<!-- 스터디장일때 본인의 스터디 출력 -->
+	<select id="studyClassMemberList" parameterType="co.mini.soyg.studyclass.vo.StudyClassVO" resultType="co.mini.soyg.studyclass.vo.StudyClassVO">
+		select * from class where captain = #{captain}
+	</select>
+	<select id="classMemberList" parameterType="co.mini.soyg.studyclass.vo.StudyClassVO" resultType="co.mini.soyg.studyclass.vo.StudyClassVO">
+		select a.*, b.* from class a , class_member b where a.class_code = b.class_code and b.userId=#{userId}
+	</select>
+	
+	<!-- 스터디장 스터디관리 -->
+	<update id="updateClass" parameterType="co.mini.soyg.studyclass.vo.StudyClassVO">
+		UPDATE CLASS SET CLASS_NAME = #{class_name}, CLASS_INFO = #{class_info}, CLASS_STARTCHK = #{class_startchk}, CLASS_PERSONNEL = #{class_personnel}, CLASS_TIME = #{class_time} WHERE CLASS_CODE = #{class_code}
+	</update>
+</mapper>

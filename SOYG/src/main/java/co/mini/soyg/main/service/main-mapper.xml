@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="co.mini.soyg.main.service.main-mapper">
+
+<!-- 메인 지역별 카테고리 리스트 보여주기 -->
+<select id="mainRegionList" resultType="co.mini.soyg.main.vo.MainVO">
+	select * from category where BIGCODE = 'L' and not loc_code is null
+</select>
+
+<!-- 메인 분야별 카테고리 리스트 보여주기 -->
+<select id="mainFieldsList" resultType="co.mini.soyg.main.vo.MainVO">
+	select * from category where BIGCODE = 'F' and not field_code is null
+</select>
+
+<!-- 메인 최근에 등록된 스터디 리스트 보여주기 -->
+<select id="recentlyClass" resultType="co.mini.soyg.main.vo.MainVO">
+	select * from class c join loc_info l
+	using (loc_code)
+	join field_info f
+	using (field_code)
+	order by c.class_code desc
+</select>
+
+<!-- 지역별 스터디 아이콘 클릭 시 처리 -->
+<select id="regionList" parameterType="co.mini.soyg.main.vo.MainVO" resultType="co.mini.soyg.main.vo.MainVO">
+	select c.class_code, c.loc_code, c.class_name, c.start_date, c.class_image, c.class_info, c.class_active, c.class_startchk, c.class_personnel, c.field_code, c.weekdays_chk, c.class_time, c.captain, c.city, count(like_check) as like_cnt, l.LIKE_CHECK,
+                (select count(case when like_check = 'Y' then 1 end) as like_cnt from likeIT where class_code = #{class_code}) as all_cnt
+	from class c LEFT OUTER JOIN 
+                    (select c.class_code, c.loc_code, c.class_name, c.start_date, c.class_image, c.class_info, c.class_active, c.class_startchk, c.class_personnel, c.field_code, c.weekdays_chk, c.class_time, c.captain, c.city, l.LIKE_CHECK
+                      from class c LEFT OUTER JOIN likeIt l 
+                      on c.class_code = l.class_code
+                      where l.USERID = #{userId}
+                      GROUP BY  c.class_code, c.loc_code, c.class_name, c.start_date, c.class_image, c.class_info, c.class_active, c.class_startchk, c.class_personnel, c.field_code, c.weekdays_chk, c.class_time, c.captain, c.city, l.LIKE_CHECK
+                    ) l
+	on c.class_code = l.class_code
+	where c.loc_code = #{loc_code}
+	GROUP BY  c.class_code, c.loc_code, c.class_name, c.start_date, c.class_image, c.class_info, c.class_active, c.class_startchk, c.class_personnel, c.field_code, c.weekdays_chk, c.class_time, c.captain, c.city, l.LIKE_CHECK
+</select>
+
+<!-- 분야별 스터디 아이콘 클릭 시 처리 -->
+<select id="fieldsList" parameterType="co.mini.soyg.main.vo.MainVO" resultType="co.mini.soyg.main.vo.MainVO">
+	select c.class_code, c.loc_code, c.class_name, c.start_date, c.class_image, c.class_info, c.class_active, c.class_startchk, c.class_personnel, c.field_code, c.weekdays_chk, c.class_time, c.captain, c.city, count(like_check) as like_cnt, l.LIKE_CHECK
+	from class c LEFT OUTER JOIN 
+                    (select c.class_code, c.loc_code, c.class_name, c.start_date, c.class_image, c.class_info, c.class_active, c.class_startchk, c.class_personnel, c.field_code, c.weekdays_chk, c.class_time, c.captain, c.city, l.LIKE_CHECK
+                      from class c LEFT OUTER JOIN likeIt l 
+                      on c.class_code = l.class_code
+                      where l.USERID = #{userId}
+                      GROUP BY  c.class_code, c.loc_code, c.class_name, c.start_date, c.class_image, c.class_info, c.class_active, c.class_startchk, c.class_personnel, c.field_code, c.weekdays_chk, c.class_time, c.captain, c.city, l.LIKE_CHECK
+                    ) l
+	on c.class_code = l.class_code
+	where c.field_code = #{field_code}
+	GROUP BY  c.class_code, c.loc_code, c.class_name, c.start_date, c.class_image, c.class_info, c.class_active, c.class_startchk, c.class_personnel, c.field_code, c.weekdays_chk, c.class_time, c.captain, c.city, l.LIKE_CHECK
+</select>
+
+<!-- 지역별 카테고리 리스트 상세 -->
+<select id="regSelect" resultType="co.mini.soyg.main.vo.MainVO">
+	select loc_code, loc_name from category where BIGCODE = 'L' and not loc_code is null
+</select>
+
+<!-- 분야별 카테고리 리스트 상세 -->
+<select id="fieldsSelect" resultType="co.mini.soyg.main.vo.MainVO">
+	select field_code, field_name from category where BIGCODE = 'F' and not field_code is null
+</select>
+
+<!-- 지역 카테고리별 리스트 간판에 무슨 페이지인지 띄워주고 싶다 -->
+<select id="regionName" resultType="co.mini.soyg.main.vo.MainVO">
+	select loc_name from category where loc_code = #{loc_code}
+</select>
+
+<!-- 분야 카테고리별 리스트 간판에 올려줄 이름 -->
+<select id="fieldsName" resultType="co.mini.soyg.main.vo.MainVO">
+	select field_name from category where field_code = #{field_code}
+</select>
+
+<!-- 검색 기능을 만들자 -->
+<select id="searchClass" resultType="co.mini.soyg.main.vo.MainVO" parameterType="co.mini.soyg.main.vo.MainVO">
+	select *
+  	from class c join loc_info l
+	using (loc_code)
+	join field_info f
+	using (field_code)
+	full OUTER join (select c.class_code, i.LIKE_CHECK
+          from class c LEFT OUTER JOIN likeIt i 
+          on c.class_code = i.class_code
+          where i.USERID = #{userId}
+          GROUP BY  c.class_code, c.loc_code, c.class_name, c.start_date, c.class_image, c.class_info, c.class_active, c.class_startchk, c.class_personnel, c.field_code, c.weekdays_chk, c.class_time, c.captain, c.city, i.LIKE_CHECK
+          ) u
+    using (class_code)
+	where c.city like '%' || #{search} || '%' or f.field_name like '%' || #{search} || '%' or c.class_name like '%' || #{search} || '%' or c.captain like '%' || #{search} || '%'
+</select>
+
+<!-- 각 스터디별 좋아요 개수를 가져오자! -->
+<select id="likeCount" resultType="co.mini.soyg.main.vo.MainVO" parameterType="co.mini.soyg.main.vo.MainVO">
+	select count(case when like_check = 'Y' then 1 end) from likeIT where class_code = #{class_code}
+</select>
+
+</mapper>
